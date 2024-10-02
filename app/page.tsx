@@ -4,23 +4,30 @@ import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [settings, setSettings] = useState({ title: 'Welcome to the Restaurant', subtitle: 'This is a sample restaurant webpage template.' });
-
-  // Hardcoded URL for now
-  const hardcodedURL = "https://restauranttemplate-deployment-1727863748220.vercel.app"; 
+  const [currentURL, setCurrentURL] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch title and subtitle from MongoDB based on the hardcoded URL
-    const fetchSettings = async () => {
-      const res = await fetch(`/api/get-settings?url=${encodeURIComponent(hardcodedURL)}`);
-      const data = await res.json();
-      if (data.success) {
-        setSettings({ title: data.settings.title, subtitle: data.settings.subtitle });
-      } else {
-        console.error("Failed to fetch settings:", data.message);
-      }
-    };
-    fetchSettings();
-  }, [hardcodedURL]);
+    // Get the current URL dynamically using window.location.href
+    if (typeof window !== 'undefined') {
+      setCurrentURL(window.location.href);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentURL) {
+      // Fetch title and subtitle from MongoDB based on the current URL
+      const fetchSettings = async () => {
+        const res = await fetch(`/api/get-settings?url=${encodeURIComponent(currentURL)}`);
+        const data = await res.json();
+        if (data.success) {
+          setSettings({ title: data.settings.title, subtitle: data.settings.subtitle });
+        } else {
+          console.error("Failed to fetch settings:", data.message);
+        }
+      };
+      fetchSettings();
+    }
+  }, [currentURL]);
 
   return (
     <div style={{ textAlign: 'center', marginTop: '100px' }}>
