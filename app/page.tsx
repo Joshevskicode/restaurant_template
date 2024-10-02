@@ -74,20 +74,7 @@ export default function Home() {
       <h1>{settings.title}</h1>
       <p>{settings.subtitle}</p>
 
-      <h2>Current URL: {currentUrl}</h2>
-
-      <h2>List of Users</h2>
-      {loading ? (
-        <p>Loading users...</p>
-      ) : (
-        <ul>
-          {users.map((user, index) => (
-            <li key={index}>
-              <strong>Account:</strong> {user.acc} - <strong>Project ID:</strong> {user.projectId}
-            </li>
-          ))}
-        </ul>
-      )}
+    
     </div>
   );
 }
