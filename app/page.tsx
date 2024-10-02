@@ -12,14 +12,16 @@ export default function Home() {
   const [settings, setSettings] = useState({ title: 'Welcome to the Restaurant', subtitle: 'This is a sample restaurant webpage template.' });
   const [users, setUsers] = useState<User[]>([]); // Set the type of users to an array of User
   const [loading, setLoading] = useState(true);
-
-  // Hardcoded URL for now
-  const hardcodedURL = "https://restauranttemplate-deployment-1727868399124.vercel.app"; 
+  const [currentUrl, setCurrentUrl] = useState('');
 
   useEffect(() => {
-    // Fetch title and subtitle from MongoDB based on the hardcoded URL
+    // Dynamically get the current URL
+    const url = window.location.href;
+    setCurrentUrl(url);
+
+    // Fetch title and subtitle from MongoDB based on the current URL
     const fetchSettings = async () => {
-      const res = await fetch(`/api/get-settings?url=${encodeURIComponent(hardcodedURL)}`);
+      const res = await fetch(`/api/get-settings?url=${encodeURIComponent(url)}`);
       const data = await res.json();
       if (data.success) {
         setSettings({ title: data.settings.title, subtitle: data.settings.subtitle });
@@ -43,12 +45,14 @@ export default function Home() {
     // Call both fetches
     fetchSettings();
     fetchUsers();
-  }, [hardcodedURL]);
+  }, []);
 
   return (
     <div style={{ textAlign: 'center', marginTop: '100px' }}>
       <h1>{settings.title}</h1>
       <p>{settings.subtitle}</p>
+
+      <h2>Current URL: {currentUrl}</h2>
 
       <h2>List of Users</h2>
       {loading ? (
