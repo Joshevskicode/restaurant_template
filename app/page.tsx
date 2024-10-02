@@ -1,4 +1,3 @@
-// restaurant_template/pages/index.tsx
 'use client';
 import { useEffect, useState } from 'react';
 
@@ -20,8 +19,17 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // Dynamically construct the current URL
-      const url = `${window.location.origin}${window.location.pathname}`;
+      let url = `${window.location.origin}${window.location.pathname}`;
+
+      // Remove trailing slash if it exists
+      if (url.endsWith('/')) {
+        url = url.slice(0, -1);
+      }
+
       setCurrentUrl(url);
+
+      // Log the URL to the console
+      console.log('Processed URL without trailing slash:', url);
 
       // Fetch title and subtitle from MongoDB based on the current URL
       const fetchSettings = async () => {
