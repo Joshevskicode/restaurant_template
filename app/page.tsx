@@ -9,43 +9,57 @@ interface User {
 }
 
 export default function Home() {
-  const [settings, setSettings] = useState({ title: 'Welcome to the Restaurant', subtitle: 'This is a sample restaurant webpage template.' });
+  const [settings, setSettings] = useState({
+    title: 'Welcome to the Restaurant',
+    subtitle: 'This is a sample restaurant webpage template.',
+  });
   const [users, setUsers] = useState<User[]>([]); // Set the type of users to an array of User
   const [loading, setLoading] = useState(true);
-  const [currentUrl, setCurrentUrl] = useState('');
+  const [currentUrl, setCurrentUrl] = useState(''); // Initialize as empty string
 
   useEffect(() => {
-    // Dynamically get the current URL
-    const url = window.location.href;
-    setCurrentUrl(url);
+    if (typeof window !== 'undefined') {
+      // Dynamically construct the current URL
+      const url = `${window.location.origin}${window.location.pathname}`;
+      setCurrentUrl(url);
 
-    // Fetch title and subtitle from MongoDB based on the current URL
-    const fetchSettings = async () => {
-      const res = await fetch(`/api/get-settings?url=${encodeURIComponent(url)}`);
-      const data = await res.json();
-      if (data.success) {
-        setSettings({ title: data.settings.title, subtitle: data.settings.subtitle });
-      } else {
-        console.error("Failed to fetch settings:", data.message);
-      }
-    };
+      // Fetch title and subtitle from MongoDB based on the current URL
+      const fetchSettings = async () => {
+        try {
+          const res = await fetch(`/api/get-settings?url=${encodeURIComponent(url)}`);
+          const data = await res.json();
+          if (data.success) {
+            setSettings({ title: data.settings.title, subtitle: data.settings.subtitle });
+          } else {
+            console.error('Failed to fetch settings:', data.message);
+          }
+        } catch (error) {
+          console.error('Error fetching settings:', error);
+        }
+      };
 
-    // Fetch users from MongoDB
-    const fetchUsers = async () => {
-      const res = await fetch('/api/get-users');
-      const data = await res.json();
-      if (data.success) {
-        setUsers(data.users);
-      } else {
-        console.error('Failed to fetch users:', data.message);
-      }
-      setLoading(false);
-    };
+      // Fetch users from MongoDB
+      const fetchUsers = async () => {
+        try {
+          const res = await fetch('/api/get-users');
+          const data = await res.json();
+          if (data.success) {
+            setUsers(data.users);
+          } else {
+            console.error('Failed to fetch users:', data.message);
+          }
+        } catch (error) {
+          console.error('Error fetching users:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    // Call both fetches
-    fetchSettings();
-    fetchUsers();
-  }, []);
+      // Call both fetches
+      fetchSettings();
+      fetchUsers();
+    }
+  }, []); // No dependencies needed since the URL is constructed on mount
 
   return (
     <div style={{ textAlign: 'center', marginTop: '100px' }}>
